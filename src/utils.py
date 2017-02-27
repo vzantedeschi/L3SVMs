@@ -164,7 +164,7 @@ def load_dense_dataset(dataset_name,norm=False):
 
 # ------------------------------------------------------------------- ARG PARSER
 
-def get_args(prog,dataset_name="svmguide1",nb_clusters=1,nb_landmarks=10,linear=True,pca=False):
+def get_args(prog,dataset_name="svmguide1",nb_clusters=1,nb_landmarks=10,linear=True,pca=False,nb_iterations=1):
 
     parser = argparse.ArgumentParser(prog=prog,formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -176,8 +176,8 @@ def get_args(prog,dataset_name="svmguide1",nb_clusters=1,nb_landmarks=10,linear=
                         help='number of landmarks')
     parser.add_argument("-o", "--normalize", dest='norm', action="store_true",
                         help='if set, the dataset is normalized')
-    parser.add_argument("-c", "--centeredk", dest='centered', action="store_true",
-                        help='if set, the centered linear kernel is used instead of the std linear')
+    parser.add_argument("-i", "--nbiter", type=int, dest='nb_iterations', default=nb_iterations,
+                        help='number of times the learning is repeated')
     parser.add_argument("-r", "--rbfk", dest='linear', action="store_false",
                         help='if set, the rbf kernel is used')
     parser.add_argument("-p", "--pca", dest='pca', action="store_true",

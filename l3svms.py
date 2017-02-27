@@ -15,6 +15,7 @@ DATASET = args.dataset_name # default svmguide1
 NORM = args.norm # default False
 LIN = args.linear # default True
 PCA_BOOL = args.pca # default False
+ITER = args.nb_iterations # default 1
 
 print("learning on {}: {} clusters, {} landmarks".format(DATASET,CLUS,LAND))
 
@@ -32,7 +33,7 @@ t1 = time.time()
 # load dataset
 train_y,train_x,test_y,test_x = load_dataset(DATASET,norm=NORM)
 t2 = time.time()
-print("dataset loading time:",t2-t1)
+print("dataset loading time:",t2-t1,"s")
 
 if PCA_BOOL:
     if LAND > train_x.shape[1]:
@@ -41,8 +42,9 @@ if PCA_BOOL:
 else:
     print("random landmarks")
 
+print("--------------------\n")
 acc_list = []
-for it in range(2):
+for it in range(ITER):
 
     t2 = time.time()
     if CLUS > 1:
@@ -55,7 +57,7 @@ for it in range(2):
         train_clusters = None
         test_clusters = None
     t3 = time.time()
-    print("clustering time:",t3-t2)
+    print("clustering time:",t3-t2,"s")
 
     # select landmarks
     if PCA_BOOL:
@@ -66,7 +68,7 @@ for it in range(2):
     u = None
 
     t2 = time.time()
-    print("landmarks selection time:",t2-t3)
+    print("landmarks selection time:",t2-t3,"s")
     t2 = time.time()
 
     # project data
@@ -74,32 +76,36 @@ for it in range(2):
     tr_x = parallelized_projection(-1,train_x,landmarks,clusters=train_clusters,unit_vectors=u,linear=LIN)
 
     t3 = time.time()
-    print("projection time:",t3-t2)
+    print("projection time:",t3-t2,"s")
     t3 = time.time()
 
     # tuning
-    best_C,_ = train(train_y, tr_x, '-C -s 2 -B 1')
+    best_C,_ = train(train_y, tr_x, '-C -s 2 -B 1 -q')
 
     t4 = time.time()
-    print("tuning time:",t4-t3)
+    print("tuning time:",t4-t3,"s")
     # training
-    m = train(train_y, tr_x, '-c {} -s 2 -B 1'.format(best_C))
-    assert m.nr_feature == LAND*CLUS
+    model = train(train_y, tr_x, '-c {} -s 2 -B 1 -q'.format(best_C))
+    assert model.nr_feature == LAND*CLUS
 
     t5 = time.time()
-    print("training time:",t5-t4)
+    print("training time:",t5-t4,"s")
 
     te_x = parallelized_projection(-1,test_x,landmarks,clusters=test_clusters,unit_vectors=u,linear=LIN)
     # te_x = project(test_x,landmarks,clusters=test_clusters,unit_vectors=u,linear=LIN)
-    p_label,p_acc,p_val = predict(test_y, te_x, m)
+    p_label,p_acc,p_val = predict(test_y, te_x, model)
 
     acc_list.append(p_acc[0])
 
     t6 = time.time()
-    print("testing time:",t6-t5)
+    print("testing time:",t6-t5,"s")
 
-    print(evaluations(test_y,p_label),t6-t1)
+    print("iteration {} results: (accuracy,mean squared error,squared correlation coefficient), learning time".format(it))
+    print(evaluations(test_y,p_label),t6-t2)
 
+    print("-------------------\n")
+
+print("Mean accuracy (%), mean stdev (%) over {} iterations:".format(ITER))
 try:
     print(statistics.mean(acc_list),statistics.stdev(acc_list))
 except:

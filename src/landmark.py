@@ -5,6 +5,7 @@ import random
 from scipy.sparse import csr_matrix
 from sklearn.decomposition import PCA
 
+# ----------------------------------------------------------- LAND SELECTION
 def random_landmarks(x,n):
     m = x.shape[0]
     landmarks = x[random.sample(range(m),min(m,n))]
