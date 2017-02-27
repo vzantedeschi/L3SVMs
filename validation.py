@@ -1,8 +1,7 @@
 import time
 import statistics
 
-import l3svms
-
+from src.l3svms import *
 from src.utils import *
 
 args = get_args(__file__)
@@ -58,7 +57,7 @@ time_list = []
 
 for it in range(ITER):
 
-    acc,time = l3svms.learning(train_x,train_y,test_x,test_y,verboseprint,CLUS,PCA_BOOL,LIN,LAND)
+    acc,time = learning(train_x,train_y,test_x,test_y,verboseprint,CLUS,PCA_BOOL,LIN,LAND)
     acc_list.append(acc)
     time_list.append(time)
 

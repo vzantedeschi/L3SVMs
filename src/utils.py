@@ -12,30 +12,6 @@ from sklearn.preprocessing import normalize,scale
 
 # -------------------------------------------------------------- I/0 FUNCTIONS
 
-def make_directory(dir_path):
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-
-def dict_to_csv(my_dict,header,filename):
-
-    make_directory(os.path.dirname(filename))
-
-    with open(filename, 'w') as csv_file:
-        writer = csv.writer(csv_file)
-        
-        writer.writerow(header)
-        for key, value in my_dict.items():
-            writer.writerow([key, value])
-
-def csv_to_dict(filename):
-
-    with open(filename, 'r') as csv_file:
-        reader = csv.reader(csv_file)
-        next(reader,None)
-        my_dict = {row[0]:eval(row[1]) for row in reader}
-
-    return my_dict
-
 def dict_to_array(l):
     data,indices,indptr = [],[],[0]
 
@@ -84,7 +60,6 @@ def array_to_dict(a,**kwargs):
     return results
 
 # ----------------------------------------------------------------- DATASET LOADERS
-DATAPATH = "./datasets/"
 
 def load_csr_matrix(filename,y_pos=0):
     with open(filename,'r') as in_file:

@@ -3,7 +3,7 @@ import statistics
 
 from sklearn.model_selection import KFold
 
-import l3svms
+from src.l3svms import *
 from src.utils import *
 
 args = get_args(__file__,False)
@@ -67,7 +67,7 @@ for it in range(ITER):
         train_x,test_x = X[train_index],X[test_index]
         train_y,test_y = Y[train_index].tolist(),Y[test_index].tolist()
 
-        acc,time = l3svms.learning(train_x,train_y,test_x,test_y,verboseprint,CLUS,PCA_BOOL,LIN,LAND)
+        acc,time = learning(train_x,train_y,test_x,test_y,verboseprint,CLUS,PCA_BOOL,LIN,LAND)
         acc_list.append(acc)
         time_list.append(time)
 
