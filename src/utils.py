@@ -130,19 +130,21 @@ def load_dense_dataset(name,norm=False,y_pos=0):
         y,x = np.split(dataset,[1],axis=1)
 
     if norm:
-        return y,csr_matrix(normalize(x))
+        return np.squeeze(y).tolist(),csr_matrix(normalize(x))
     else:
-        return y,csr_matrix(scale(x))
+        return np.squeeze(y).tolist(),csr_matrix(scale(x))
 
 # ------------------------------------------------------------------- ARG PARSER
 
 
-def get_args(prog,dataset_name="svmguide1",nb_clusters=1,nb_landmarks=10,linear=True,pca=False,nb_iterations=1,verbose=False,y_pos=0):
+def get_args(prog,testf_required=True,nb_clusters=1,nb_landmarks=10,linear=True,pca=False,nb_iterations=1,verbose=False,y_pos=0,nb_cv=5):
 
     parser = argparse.ArgumentParser(prog=prog,formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     # positional arguments
     parser.add_argument('train_file',help='path of the training set')
-    parser.add_argument('test_file',help='path of the testing set')
+
+    if testf_required:
+        parser.add_argument('test_file',help='path of the testing set')
 
     # optional arguments
     parser.add_argument("-y", "--labelindex", type=int, dest='y_pos', default=y_pos, choices=[-1,0],
@@ -161,5 +163,7 @@ def get_args(prog,dataset_name="svmguide1",nb_clusters=1,nb_landmarks=10,linear=
                         help='if set, the landmarks are selected as the principal components')
     parser.add_argument("-v", "--verbose", dest='verbose', action="store_true",
                         help='if set, verbose mode')
+    parser.add_argument("-c", "--cv", type=int, dest='nb_cv', default=nb_cv,
+                        help='number of folds for cross-validation')
 
     return parser.parse_args()

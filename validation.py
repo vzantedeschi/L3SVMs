@@ -16,7 +16,7 @@ LIN = args.linear # default True
 PCA_BOOL = args.pca # default False
 ITER = args.nb_iterations # default 1
 VERB = args.verbose # default False
-YPOS = args.y_pos
+YPOS = args.y_pos # default 0
 
 verboseprint = print if VERB else lambda *a, **k: None
 
@@ -26,7 +26,7 @@ if LIN:
     verboseprint("linear kernel")
 else:
     verboseprint("rbf kernel")
-    CENT = False
+
 if NORM:
     verboseprint("normalized dataset")
 else:
@@ -41,8 +41,6 @@ try:
 except:
     train_y,train_x = load_dense_dataset(TRAIN,norm=NORM,y_pos=YPOS)
     test_y,test_x = load_dense_dataset(TEST,norm=NORM,y_pos=YPOS)
-    train_y = np.squeeze(train_y).tolist()
-    test_y = np.squeeze(test_y).tolist()
 
 t2 = time.time()
 verboseprint("dataset loading time:",t2-t1,"s")
