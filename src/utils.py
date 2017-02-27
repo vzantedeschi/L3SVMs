@@ -164,7 +164,8 @@ def load_dense_dataset(dataset_name,norm=False):
 
 # ------------------------------------------------------------------- ARG PARSER
 
-def get_args(prog,dataset_name="svmguide1",nb_clusters=1,nb_landmarks=10,linear=True,pca=False,nb_iterations=1):
+
+def get_args(prog,dataset_name="svmguide1",nb_clusters=1,nb_landmarks=10,linear=True,pca=False,nb_iterations=1,verbose=False):
 
     parser = argparse.ArgumentParser(prog=prog,formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -182,5 +183,7 @@ def get_args(prog,dataset_name="svmguide1",nb_clusters=1,nb_landmarks=10,linear=
                         help='if set, the rbf kernel is used')
     parser.add_argument("-p", "--pca", dest='pca', action="store_true",
                         help='if set, the landmarks are selected as the principal components')
+    parser.add_argument("-v", "--verbose", dest='verbose', action="store_true",
+                        help='if set, verbose mode')
 
     return parser.parse_args()

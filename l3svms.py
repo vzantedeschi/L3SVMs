@@ -16,34 +16,39 @@ NORM = args.norm # default False
 LIN = args.linear # default True
 PCA_BOOL = args.pca # default False
 ITER = args.nb_iterations # default 1
+VERB = args.verbose # default False
 
-print("learning on {}: {} clusters, {} landmarks".format(DATASET,CLUS,LAND))
+verboseprint = print if VERB else lambda *a, **k: None
+
+verboseprint("learning on {}: {} clusters, {} landmarks".format(DATASET,CLUS,LAND))
 
 if LIN:
-    print("linear kernel")
+    verboseprint("linear kernel")
 else:
-    print("rbf kernel")
+    verboseprint("rbf kernel")
     CENT = False
 if NORM:
-    print("normalized dataset")
+    verboseprint("normalized dataset")
 else:
-    print("scaled data")
+    verboseprint("scaled data")
 
 t1 = time.time()
 # load dataset
 train_y,train_x,test_y,test_x = load_dataset(DATASET,norm=NORM)
 t2 = time.time()
-print("dataset loading time:",t2-t1,"s")
+verboseprint("dataset loading time:",t2-t1,"s")
 
 if PCA_BOOL:
     if LAND > train_x.shape[1]:
         raise Exception("When using PCA, the nb landmarks must be at most the nb of features")
-    print("landmarks = principal components")
+    verboseprint("landmarks = principal components")
 else:
-    print("random landmarks")
+    verboseprint("random landmarks")
 
-print("--------------------\n")
+verboseprint("--------------------\n")
 acc_list = []
+time_list = []
+
 for it in range(ITER):
 
     t2 = time.time()
@@ -57,7 +62,7 @@ for it in range(ITER):
         train_clusters = None
         test_clusters = None
     t3 = time.time()
-    print("clustering time:",t3-t2,"s")
+    verboseprint("clustering time:",t3-t2,"s")
 
     # select landmarks
     if PCA_BOOL:
@@ -68,7 +73,7 @@ for it in range(ITER):
     u = None
 
     t2 = time.time()
-    print("landmarks selection time:",t2-t3,"s")
+    verboseprint("landmarks selection time:",t2-t3,"s")
     t2 = time.time()
 
     # project data
@@ -76,20 +81,20 @@ for it in range(ITER):
     tr_x = parallelized_projection(-1,train_x,landmarks,clusters=train_clusters,unit_vectors=u,linear=LIN)
 
     t3 = time.time()
-    print("projection time:",t3-t2,"s")
+    verboseprint("projection time:",t3-t2,"s")
     t3 = time.time()
 
     # tuning
     best_C,_ = train(train_y, tr_x, '-C -s 2 -B 1 -q')
 
     t4 = time.time()
-    print("tuning time:",t4-t3,"s")
+    verboseprint("tuning time:",t4-t3,"s")
     # training
     model = train(train_y, tr_x, '-c {} -s 2 -B 1 -q'.format(best_C))
     assert model.nr_feature == LAND*CLUS
 
     t5 = time.time()
-    print("training time:",t5-t4,"s")
+    verboseprint("training time:",t5-t4,"s")
 
     te_x = parallelized_projection(-1,test_x,landmarks,clusters=test_clusters,unit_vectors=u,linear=LIN)
     # te_x = project(test_x,landmarks,clusters=test_clusters,unit_vectors=u,linear=LIN)
@@ -98,15 +103,16 @@ for it in range(ITER):
     acc_list.append(p_acc[0])
 
     t6 = time.time()
-    print("testing time:",t6-t5,"s")
+    verboseprint("testing time:",t6-t5,"s")
+    time_list.append(t6-t5)
 
-    print("iteration {} results: (accuracy,mean squared error,squared correlation coefficient), learning time".format(it))
-    print(evaluations(test_y,p_label),t6-t2)
+    verboseprint("iteration {} results: (accuracy,mean squared error,squared correlation coefficient), learning time".format(it))
+    verboseprint(evaluations(test_y,p_label),t6-t2)
 
     print("-------------------\n")
 
-print("Mean accuracy (%), mean stdev (%) over {} iterations:".format(ITER))
+print("Mean accuracy (%), mean stdev (%), mean time (s) over {} iterations:".format(ITER))
 try:
-    print(statistics.mean(acc_list),statistics.stdev(acc_list))
+    print(statistics.mean(acc_list),statistics.stdev(acc_list),statistics.mean(time_list))
 except:
-    print(acc_list[0],0.)
+    print(acc_list[0],0.,time_list[0])
