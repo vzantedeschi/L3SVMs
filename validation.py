@@ -6,18 +6,21 @@ import l3svms
 from src.utils import *
 
 args = get_args(__file__)
+TRAIN = args.train_file
+TEST = args.test_file
+
 LAND = args.nb_landmarks # default 10
 CLUS = args.nb_clusters # default 1
-DATASET = args.dataset_name # default svmguide1
 NORM = args.norm # default False
 LIN = args.linear # default True
 PCA_BOOL = args.pca # default False
 ITER = args.nb_iterations # default 1
 VERB = args.verbose # default False
+YPOS = args.y_pos
 
 verboseprint = print if VERB else lambda *a, **k: None
 
-verboseprint("learning on {}: {} clusters, {} landmarks".format(DATASET,CLUS,LAND))
+verboseprint("training on {}, testing on {}: {} clusters, {} landmarks".format(TRAIN,TEST,CLUS,LAND))
 
 if LIN:
     verboseprint("linear kernel")
@@ -30,8 +33,17 @@ else:
     verboseprint("scaled data")
 
 t1 = time.time()
+
 # load dataset
-train_y,train_x,test_y,test_x = load_dataset(DATASET,norm=NORM)
+try:
+    train_y,train_x = load_sparse_dataset(TRAIN,norm=NORM,y_pos=YPOS)
+    test_y,test_x = load_sparse_dataset(TEST,norm=NORM,y_pos=YPOS)
+except:
+    train_y,train_x = load_dense_dataset(TRAIN,norm=NORM,y_pos=YPOS)
+    test_y,test_x = load_dense_dataset(TEST,norm=NORM,y_pos=YPOS)
+    train_y = np.squeeze(train_y).tolist()
+    test_y = np.squeeze(test_y).tolist()
+
 t2 = time.time()
 verboseprint("dataset loading time:",t2-t1,"s")
 

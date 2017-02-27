@@ -86,7 +86,7 @@ def array_to_dict(a,**kwargs):
 # ----------------------------------------------------------------- DATASET LOADERS
 DATAPATH = "./datasets/"
 
-def load_csr_matrix(filename):
+def load_csr_matrix(filename,y_pos=0):
     with open(filename,'r') as in_file:
         data,indices,indptr = [],[],[0]
 
@@ -97,7 +97,8 @@ def load_csr_matrix(filename):
             line = line.split(None, 1)
             if len(line) == 1: 
                 line += ['']
-            label, features = line
+            label = line[y_pos]
+            features = line[-1-y_pos]
             labels.append(float(label))
 
             f_list = features.split()
@@ -112,65 +113,40 @@ def load_csr_matrix(filename):
 
         return labels,csr_matrix((data, indices, indptr))
 
-def load_dataset(name,norm=False):
+def load_sparse_dataset(name,norm=False,y_pos=0):
 
-    if name == "letter":
-        m = 16000
-        y,x = load_csr_matrix(DATAPATH+"letter-recognition.data.sparse")
-        train_y,test_y = y[:m],y[m:]
-        train_x,test_x = x[:m],x[m:]
-
-    else:
-        if name == "svmguide1":
-            train_path = DATAPATH+name
-            test_path = DATAPATH+name+'.t'
-
-        elif name == "ijcnn1":
-            train_path = DATAPATH+name+'.tr'
-            test_path = DATAPATH+name+'.t'
-
-        elif name == "mnist":
-            train_path = DATAPATH+name+'_train.csv.sparse'
-            test_path = DATAPATH+name+'_test.csv.sparse'
-
-
-        train_y,train_x = load_csr_matrix(train_path)
-        
-        test_y,test_x = load_csr_matrix(test_path)
+    y,x = load_csr_matrix(name,y_pos)
 
     if norm:
-        return train_y,normalize(train_x),test_y,normalize(test_x)
+        return y,normalize(x)
     else:
-        return train_y,scale(train_x,with_mean=False),test_y,scale(test_x,with_mean=False)
+        return y,scale(x,with_mean=False)
 
-def load_dense_dataset(dataset_name,norm=False):
-    dataset = np.loadtxt(DATAPATH+dataset_name+".txt")
-    if dataset_name == "sonar":
+def load_dense_dataset(name,norm=False,y_pos=0):
+    dataset = np.loadtxt(name)
+    if y_pos == -1:
         x,y = np.split(dataset,[-1],axis=1)
-    elif dataset_name == "ionosphere":
-        x,y = np.split(dataset,[-1],axis=1)
-    elif dataset_name == "heart-statlog":
+    else:
         y,x = np.split(dataset,[1],axis=1)
-    elif dataset_name == "liver":
-        x,y = np.split(dataset,[-1],axis=1)
-        y[y==2] = -1
-    else:
-        raise Exception("Unknown dataset: please implement a loader.")
 
     if norm:
-        return csr_matrix(normalize(x)),y
+        return y,csr_matrix(normalize(x))
     else:
-        return csr_matrix(scale(x)),y
+        return y,csr_matrix(scale(x))
 
 # ------------------------------------------------------------------- ARG PARSER
 
 
-def get_args(prog,dataset_name="svmguide1",nb_clusters=1,nb_landmarks=10,linear=True,pca=False,nb_iterations=1,verbose=False):
+def get_args(prog,dataset_name="svmguide1",nb_clusters=1,nb_landmarks=10,linear=True,pca=False,nb_iterations=1,verbose=False,y_pos=0):
 
     parser = argparse.ArgumentParser(prog=prog,formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    # positional arguments
+    parser.add_argument('train_file',help='path of the training set')
+    parser.add_argument('test_file',help='path of the testing set')
 
-    parser.add_argument("-d", "--dataset", dest='dataset_name', default=dataset_name,
-                        help='dataset name')
+    # optional arguments
+    parser.add_argument("-y", "--labelindex", type=int, dest='y_pos', default=y_pos, choices=[-1,0],
+                        help='index of the labels in the file')
     parser.add_argument("-n", "--nbclusters", type=int, dest='nb_clusters', default=nb_clusters,
                         help='number of clusters')
     parser.add_argument("-l", "--nblands", type=int, dest='nb_landmarks', default=nb_landmarks,
