@@ -21,4 +21,12 @@ Main Features:
 
 ## Usage
 
+### Example Scripts
 
+1. *validation.py* trains a L3SVM on a training set and tests it on a testing set. For help, run
+
+ > python validation.py -h
+
+2. *cross_validation.py* performs a cross-validation on a dataset. For help, run
+
+ > python cross_validation.py -h

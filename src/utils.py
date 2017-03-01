@@ -128,17 +128,17 @@ def get_args(prog,testf_required=True,nb_clusters=1,nb_landmarks=10,linear=True,
                         help='number of clusters')
     parser.add_argument("-l", "--nblands", type=int, dest='nb_landmarks', default=nb_landmarks,
                         help='number of landmarks')
-    parser.add_argument("-o", "--normalize", dest='norm', action="store_true",
-                        help='if set, the dataset is normalized')
     parser.add_argument("-i", "--nbiter", type=int, dest='nb_iterations', default=nb_iterations,
                         help='number of times the learning is repeated')
-    parser.add_argument("-r", "--rbfk", dest='linear', action="store_false",
-                        help='if set, the rbf kernel is used')
-    parser.add_argument("-p", "--pca", dest='pca', action="store_true",
-                        help='if set, the landmarks are selected as the principal components')
-    parser.add_argument("-v", "--verbose", dest='verbose', action="store_true",
-                        help='if set, verbose mode')
     parser.add_argument("-c", "--cv", type=int, dest='nb_cv', default=nb_cv,
                         help='number of folds for cross-validation')
+    parser.add_argument("-r", "--rbfk", dest='linear', action="store_false",
+                        help='if set, the rbf projection is used, otherwise the dot product')
+    parser.add_argument("-o", "--normalize", dest='norm', action="store_true",
+                        help='if set, the dataset is normalized, otherwise rescaled to stdev=1')
+    parser.add_argument("-p", "--pca", dest='pca', action="store_true",
+                        help='if set, the landmarks are selected as the principal components, otherwise randomly')
+    parser.add_argument("-v", "--verbose", dest='verbose', action="store_true",
+                        help='if set, verbose mode')
 
     return parser.parse_args()
