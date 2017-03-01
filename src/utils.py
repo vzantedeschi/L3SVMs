@@ -2,11 +2,9 @@
 
 # ---------------------------------------------------------------------- IMPORTS
 import argparse
-import csv
 import numpy as np
 import os
 
-from liblinearutil import *
 from scipy.sparse import csr_matrix
 from sklearn.preprocessing import normalize,scale
 

@@ -12,9 +12,9 @@ Main Features:
 
 ## Installation
 
-1. Install [liblinear](https://github.com/cjlin1/liblinear) and [libsvm](https://github.com/arnaudsj/libsvm)
+1. Install [liblinear](https://github.com/cjlin1/liblinear)
 
-2. Add to your PYTHONPATH the paths to *liblinear/python/* and to *libsvm/python/*
+2. Add to your PYTHONPATH the paths to *liblinear/python/*
 
 3. Install required python modules:
 
