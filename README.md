@@ -1,6 +1,7 @@
 # L3SVMs
 ## Landmarks-based Linear Local Support Vectors Machines
-----
+
+**python3 project**
 
 L3SVMs is a new **local SVM method** which clusters the input space, carries out dimensionality reduction by projecting the data on *landmarks*, and jointly learns a linear combination of local models.
 
