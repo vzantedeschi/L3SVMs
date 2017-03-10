@@ -10,7 +10,7 @@ from sklearn.metrics import pairwise
 
 from src.utils import array_to_dict
 
-def project(x,landmarks,clusters=None,unit_vectors=None,linear=True):
+def project(x,landmarks,clusters=None,unit_vectors=None,linear=True,gamma=1):
 
     # project on landmark space
     if unit_vectors is not None:
@@ -22,7 +22,7 @@ def project(x,landmarks,clusters=None,unit_vectors=None,linear=True):
         if linear:
             projection = x.dot(landmarks.transpose())
         else:
-            projection = pairwise.rbf_kernel(x,landmarks)
+            projection = pairwise.rbf_kernel(x,landmarks,gamma=gamma)
 
     if clusters is not None:
         assert len(clusters) == x.shape[0]
@@ -42,7 +42,7 @@ def project_with_id(indexes,x,landmarks,clusters=None,unit_vectors=None,linear=T
         if linear:
             projection = a.dot(landmarks.transpose())
         else:
-            projection = pairwise.rbf_kernel(a,landmarks)
+            projection = pairwise.rbf_kernel(a,landmarks,gamma=gamma)
 
     if clusters is not None:
         return array_to_dict(projection,clusters=clusters[indexes],land=landmarks.shape[0])

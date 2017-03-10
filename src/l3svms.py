@@ -69,8 +69,8 @@ def learning(train_x,train_y,test_x,test_y,printf=print,CLUS=1,PCA_BOOL=False,LI
     t5 = time.time()
     printf("training time:",t5-t4,"s")
 
-    te_x = parallelized_projection(-1,test_x,landmarks,clusters=test_clusters,unit_vectors=u,linear=LIN)
-    # te_x = project(test_x,landmarks,clusters=test_clusters,unit_vectors=u,linear=LIN)
+    te_x = parallelized_projection(-1,test_x,landmarks,clusters=test_clusters,unit_vectors=u,linear=LIN,gamma=best_G)
+    # te_x = project(test_x,landmarks,clusters=test_clusters,unit_vectors=u,linear=LIN,gamma=best_G)
     p_label,p_acc,p_val = predict(test_y, te_x, model)
 
     t6 = time.time()
