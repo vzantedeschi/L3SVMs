@@ -1,7 +1,6 @@
 import time
 
 from liblinearutil import *
-from svmutil import *
 from sklearn import cluster
 
 from src.landmark import *
