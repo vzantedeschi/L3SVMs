@@ -44,19 +44,21 @@ def learning(train_x,train_y,test_x,test_y,printf=print,CLUS=1,PCA_BOOL=False,LI
     # tuning
     if LIN:
         tr_x = parallelized_projection(-1,train_x,landmarks,clusters=train_clusters,unit_vectors=u,linear=LIN)
-        best_C,_ = train(train_y, tr_x, '-C -s 2 -B 1 -q')
+        best_C,_,_ = train(train_y, tr_x, '-C -s 2 -B 1 -q')
         best_G = None
     else:
         best_G,best_C,best_acc = 0,0,0
         for g in [10**i for i in range(-3,3)]:
             tr_x = parallelized_projection(-1,train_x,landmarks,clusters=train_clusters,unit_vectors=u,linear=LIN,gamma=g)
-            c,p = train(train_y, tr_x, '-C -s 2 -B 1 -q')
-            if p > best_acc:
+            c,_,score = train(train_y, tr_x, '-C -s 2 -B 1 -q')
+
+            if score > best_acc:
                 best_C = c
                 best_G = g
-                best_acc = p
+                best_acc = score
 
         tr_x = parallelized_projection(-1,train_x,landmarks,clusters=train_clusters,unit_vectors=u,linear=LIN,gamma=best_G)
+        print("Best C =",best_C)
         print("Best Gamma =",best_G,"\n")
 
     t4 = time.time()
